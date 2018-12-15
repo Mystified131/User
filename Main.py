@@ -62,9 +62,10 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
-        timestr = user.timestamp
-        xnum = timestr[19]
-        key = int(xnum)
+        if user:
+            timestr = user.timestamp
+            xnum = timestr[19]
+            key = int(xnum)
         if user and check_pw_hash(password, user.password, key):
             session['email'] = email
             #flash("Logged in")
@@ -97,11 +98,10 @@ def signup():
                     list.append(i)
             timestam = "".join(list)
             timestamp = str(timestam)
-            key = list[19]
+            xnum = timestamp[19]
+            key = int(xnum)
             salt = make_salt()
-            keynm = random.randrange(6)
-            hash = make_pw_hash(password, keynm)
-            keyst = str(keynm)
+            hash = make_pw_hash(password, key)
             password = salt + hash
             new_user = User(timestamp, email, password)
             db.session.add(new_user)
