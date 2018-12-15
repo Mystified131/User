@@ -39,6 +39,7 @@ def make_pw_hash(password, keynum):
     hashlist.append(hashlib.md5(str.encode(password)).hexdigest())
     hashlist.append(hashlib.sha224(str.encode(password)).hexdigest())
     hashlist.append(hashlib.sha512(str.encode(password)).hexdigest())
+    hashlist.append(hashlib.sha1(str.encode(password)).hexdigest())
     hash = hashlist[keynum]
     return hash
 
