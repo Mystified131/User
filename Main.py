@@ -36,13 +36,15 @@ def make_pw_hash(password, keynum):
     hashlist.append(hashlib.sha256(str.encode(password)).hexdigest())
     hashlist.append(hashlib.sha384(str.encode(password)).hexdigest())
     hashlist.append(hashlib.sha512(str.encode(password)).hexdigest())
+    hashlist.append(hashlib.md5(str.encode(password)).hexdigest())
+    hashlist.append(hashlib.sha224(str.encode(password)).hexdigest())
+    hashlist.append(hashlib.sha512(str.encode(password)).hexdigest())
     hash = hashlist[keynum]
     return hash
 
-def check_pw_hash(password, hash):
-    hash2 = hash[6:]
-    hash3 = int(hash[5])
-    if make_pw_hash(password, hash3) == hash2:
+def check_pw_hash(password, hash, key):
+    hash2 = hash[5:]
+    if make_pw_hash(password, key) == hash2:
         return True
     else:
         return False
@@ -59,7 +61,10 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
-        if user and check_pw_hash(password, user.password):
+        timestr = user.timestamp
+        xnum = timestr[19]
+        key = int(xnum)
+        if user and check_pw_hash(password, user.password, key):
             session['email'] = email
             #flash("Logged in")
             return redirect('/index')
@@ -91,11 +96,12 @@ def signup():
                     list.append(i)
             timestam = "".join(list)
             timestamp = str(timestam)
+            key = list[19]
             salt = make_salt()
             keynm = random.randrange(6)
             hash = make_pw_hash(password, keynm)
             keyst = str(keynm)
-            password = salt + keyst + hash
+            password = salt + hash
             new_user = User(timestamp, email, password)
             db.session.add(new_user)
             db.session.commit()
