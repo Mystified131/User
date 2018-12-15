@@ -11,10 +11,12 @@ app.secret_key = os.urandom(24)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.String(120))
     email = db.Column(db.String(120))
     password = db.Column(db.String(120))
 
-    def __init__(self, email, password):
+    def __init__(self, timestamp, email, password):
+        self.timestamp = timestamp
         self.email = email
         self.password = password
 
@@ -82,12 +84,19 @@ def signup():
             return redirect('/signup')
         existing_user = User.query.filter_by(email=email).first()
         if not existing_user:
+            right_now = datetime.datetime.now().isoformat()
+            list = []
+            for i in right_now:
+                if i.isnumeric():
+                    list.append(i)
+            timestam = "".join(list)
+            timestamp = str(timestam)
             salt = make_salt()
             keynm = random.randrange(6)
             hash = make_pw_hash(password, keynm)
             keyst = str(keynm)
             password = salt + keyst + hash
-            new_user = User(email, password)
+            new_user = User(timestamp, email, password)
             db.session.add(new_user)
             db.session.commit()
             session['email'] = email
