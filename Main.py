@@ -133,10 +133,6 @@ def index():
     session['timestamp'] = tim
     return render_template('index.html', time = tim)
 
-@app.route("/login", methods =['GET', 'POST'])
-def frontpage():
-    return render_template('login.html')
-
 ## THE GHOST OF THE SHADOW ##
 
 if __name__ == '__main__':
